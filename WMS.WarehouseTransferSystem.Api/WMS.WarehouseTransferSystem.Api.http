@@ -1,0 +1,6 @@
+@WMS.WarehouseTransferSystem.Api_HostAddress = http://localhost:5160
+
+GET {{WMS.WarehouseTransferSystem.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

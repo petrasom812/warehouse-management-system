@@ -1,0 +1,43 @@
+# Build folders
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# ReSharper
+_ReSharper*/
+*.ReSharper
+
+# Test Results
+TestResults/
+
+# Publish Output
+publish/
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+packages/
+
+# SQL Server LocalDB
+*.mdf
+*.ldf
+
+# EF Core
+Migrations/*.Designer.cs
+
+# Secrets
+appsettings.Development.json
