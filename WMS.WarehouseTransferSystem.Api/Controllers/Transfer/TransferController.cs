@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WMS.WarehouseTransferSystem.Api.DTOs.Transfer;
 using WMS.WarehouseTransferSystem.Api.Interfaces.Transfer;
 
 namespace WMS.WarehouseTransferSystem.Api.Controllers.Transfer
 {
+    [Authorize(Roles = "Admin, Operator")]
     [ApiController]
     [Route("api/[controller]")]
     public class TransferController : ControllerBase

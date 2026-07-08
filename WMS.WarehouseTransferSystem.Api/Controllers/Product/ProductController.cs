@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WMS.WarehouseTransferSystem.Api.DTOs.Product;
 using WMS.WarehouseTransferSystem.Api.Interfaces.Product;
 
 namespace WMS.WarehouseTransferSystem.Api.Controllers.Product
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase

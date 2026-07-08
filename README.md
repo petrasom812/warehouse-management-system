@@ -2,103 +2,157 @@
 
 A backend-focused Warehouse Management System built with ASP.NET Core and Entity Framework Core.
 
-## Project Goals
+---
 
-Learn and apply:
+# Project Purpose
 
-- Master Data
-- Transaction Data
-- Retrieve
-- Validate
-- Mutate
-- Persist
+The goal of this project is to design and build a business-driven Warehouse Management System (WMS) that focuses on:
 
-## Domain Model
+- Inventory Integrity
+- Transaction Traceability
+- Role-Based Security
+- Business Rule Enforcement
+- Operational Accuracy
 
-### Master Data
-
-- Warehouse
-- Product
-- Inventory
-
-### Transaction Data
-
-- Transfer
-- TransferItem
+The system is built around business events, business rules, and data integrity rather than simple CRUD operations.
 
 ---
 
-## Warehouse Types
+# Business Philosophy
 
-### WH-PROCESS
+Business creates events.
 
-Processing warehouse used for operational inventory.
+Events create data.
 
-### WH-STORAGE
+Data creates system requirements.
 
-Storage warehouse used for reserve inventory.
+Technology implements system requirements.
+
+A system is successful when business rules survive real-world user behavior, not when code simply returns `200 OK`.
 
 ---
 
-## Product Example
+# Core Development Principle
 
-SKU:
+```text
+Retrieve
+↓
+Validate
+↓
+Mutate
+↓
+Persist
+↓
+Verify
+```
 
+---
+
+# Domain Model
+
+## Master Data
+
+Responsible for defining the structure of operations.
+
+### Warehouse
+
+Primary inventory container.
+
+### Product
+
+Inventory item definition.
+
+### User
+
+System identity.
+
+### Role
+
+Authorization and security.
+
+### UserRole
+
+Role assignment.
+
+---
+
+## Transaction Data
+
+Responsible for recording business activity.
+
+### Inventory
+
+Current inventory state.
+
+### Transfer
+
+Inventory movement event.
+
+### TransferItem
+
+Inventory movement details.
+
+---
+
+# Warehouse Types
+
+## WH-PROCESS
+
+Operational warehouse used for active inventory.
+
+## WH-STORAGE
+
+Reserve warehouse used for storage inventory.
+
+---
+
+# Product Example
+
+SKU
+
+```text
 APL16PMM512
+```
 
-Product Name:
+Product Name
 
+```text
 APPLE iPhone 16 Pro Max Midnight 512GB
+```
 
 ---
 
-## Inventory Example
-
-Warehouse:
-
-WH-PROCESS
-
-Product:
-
-APL16PMM512
-
-Quantity:
-
-100
-
----
-
-## Transfer Workflow
+# Transfer Workflow
 
 Example:
 
+```text
 Transfer 20 iPhones
 
 FROM:
-
 WH-PROCESS
 
 TO:
-
 WH-STORAGE
+```
 
-### Flow
+## Workflow
 
+```text
 Retrieve
-
 ↓
-
 Validate
-
 ↓
-
 Mutate
-
 ↓
-
 Persist
+↓
+Verify
+```
 
-### Validation
+---
+
+## Validation Rules
 
 - Source Warehouse Exists
 - Destination Warehouse Exists
@@ -108,7 +162,9 @@ Persist
 - Quantity > 0
 - Sufficient Inventory
 
-### Mutation
+---
+
+## Mutation Rules
 
 - Create Transfer
 - Create TransferItem
@@ -117,68 +173,214 @@ Persist
 
 ---
 
-## Completed Features
+# Authentication & Authorization
 
-### Warehouse
+JWT is used as the Identity Layer.
 
-- Create
-- Read
-- Update
-- Delete
+```text
+JWT
+↓
+Identity Truth
 
-### Product
-
-- Create
-- Read
-- Update
-- Delete
-
-### Inventory
-
-- Create
-- Read
-- Update
-- Delete
-
-### Transfer
-
-- Create
-- Read
-
-### Transfer Item
-
-- Create
-- Read
+WMS
+↓
+Transaction Truth
+```
 
 ---
 
-## Learning Outcomes
+## Authentication Features
 
-- EF Core Relationships
-- Navigation Properties
-- DTO Projections
-- Inventory State Management
+- User Management
+- Role Management
+- User Role Assignment
+- Password Hashing
+- Secure Login
+- JWT Token Generation
+- JWT Token Validation
+
+---
+
+## Authorization Features
+
+- Role-Based Access Control (RBAC)
+- Claims-Based Authorization
+- Admin Authorization
+- Operator Authorization
+- InventoryControl Authorization
+
+---
+
+# Business Roles
+
+## Admin
+
+Master Data Authority.
+
+Responsibilities:
+
+- Manage Users
+- Manage Roles
+- Assign Roles
+- Manage Warehouses
+- Manage Products
+
+---
+
+## Operator
+
+Transaction Authority.
+
+Responsibilities:
+
+- Process Transfers
+- Process Inventory Transactions
+
+---
+
+## InventoryControl
+
+Validation Authority.
+
+Future Responsibilities:
+
+- Cycle Count
+- Inventory Variance Investigation
+- Inventory Accuracy Validation
+
+---
+
+# Security Testing Completed
+
+## Authentication
+
+Valid Login
+
+Invalid Username
+
+Invalid Password
+
+Inactive User
+
+---
+
+## JWT Testing
+
+Token Generation
+
+Claims Validation
+
+Token Decoding
+
+JWT Signature Validation
+
+---
+
+## Authorization
+
+401 Unauthorized Testing
+
+403 Forbidden Testing
+
+Admin Access Verification
+
+Operator Access Verification
+
+Role-Based Access Control
+
+---
+
+# Current Features
+
+## Warehouse
+
+- Create
+- Read
+- Update
+
+## Product
+
+- Create
+- Read
+- Update
+
+## Inventory
+
+- Create
+- Read
+- Update
+
+## Transfer
+
+- Create
+- Read
+
+## TransferItem
+
+- Create
+- Read
+
+## Authentication
+
+- User
+- Role
+- UserRole
+- JWT
+- Authorization
+
+---
+
+# Learning Outcomes
+
+- ASP.NET Core
+- Entity Framework Core
+- JWT Authentication
+- JWT Authorization
+- Role-Based Access Control
 - Business Rule Validation
-- End-to-End Workflow Design
+- Data Integrity Validation
+- Inventory State Management
+- Enterprise Backend Design
 
 ---
 
-## Current Status
+# Current Status
 
-Warehouse
+Warehouse Management
 
-Product
+Product Management
 
-Inventory
+Inventory Management
 
-Transfer
+Transfer Management
 
-TransferItem
+User Management
 
-Inventory State Mutation
+Role Management
+
+User Role Assignment
+
+JWT Authentication
+
+JWT Authorization
+
+Role-Based Access Control
 
 ---
 
-## Next Project
+# Next Roadmap
 
-Cycle Count
+## Near Term
+
+- Audit Trail
+- Cycle Count
+- Inventory Variance Tracking
+
+## Long Term
+
+- SignalR Real-Time Updates
+- SCADA Integration (TwinCAT)
+- Reporting Platform
+- Power BI Analytics
+- Operational Intelligence Platform
+`

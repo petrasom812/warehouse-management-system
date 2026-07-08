@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using WMS.WarehouseTransferSystem.Api.Models.Auth.Role;
+using WMS.WarehouseTransferSystem.Api.Models.Auth.User;
+using WMS.WarehouseTransferSystem.Api.Models.Auth.UserRole;
 using WMS.WarehouseTransferSystem.Api.Models.Inventory;
 using WMS.WarehouseTransferSystem.Api.Models.Product;
 using WMS.WarehouseTransferSystem.Api.Models.Transfer;
@@ -17,5 +20,8 @@ namespace WMS.WarehouseTransferSystem.Api.Data
         public DbSet<InventoryModel> Inventories { get; set; }
         public DbSet<TransferModel> Transfer { get; set; }
         public DbSet<TransferItemModel> TransferItems { get; set; }
+        public DbSet<UserModel> Users {get; set;}
+        public DbSet<RoleModel> Roles {get; set;}
+        public DbSet<UserRoleModel> UserRoles {get; set;}
     }
 }

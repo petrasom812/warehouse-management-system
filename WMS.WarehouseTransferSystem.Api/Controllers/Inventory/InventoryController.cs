@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WMS.WarehouseTransferSystem.Api.DTOs.Inventory;
 using WMS.WarehouseTransferSystem.Api.Interfaces;
 
 namespace WMS.WarehouseTransferSystem.Api.Controllers.Inventory
 {
+    [Authorize(Roles = "InventoryControl, Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class InventoryController : ControllerBase

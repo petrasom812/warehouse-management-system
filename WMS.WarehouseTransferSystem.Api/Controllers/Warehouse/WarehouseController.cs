@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WMS.WarehouseTransferSystem.Api.DTOs.Warehouse;
 using WMS.WarehouseTransferSystem.Api.Interfaces;
 
 namespace WMS.WarehouseTransferSystem.Api.Controllers.Warehouse
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class WarehouseController : ControllerBase
