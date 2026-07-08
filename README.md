@@ -372,15 +372,7 @@ Role-Based Access Control
 
 ## Near Term
 
-- Audit Trail
-- Cycle Count
-- Inventory Variance Tracking
-
-## Long Term
-
-- SignalR Real-Time Updates
-- SCADA Integration (TwinCAT)
-- Reporting Platform
-- Power BI Analytics
-- Operational Intelligence Platform
+- Audit Trail (Future)
+- Cycle Count (Future)
+- Inventory Variance Tracking (Future)
 `
