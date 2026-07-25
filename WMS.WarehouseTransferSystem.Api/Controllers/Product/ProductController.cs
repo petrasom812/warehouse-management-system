@@ -18,8 +18,15 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Product
         [HttpPost] //CreateProduct
         public async Task<ActionResult> PostProduct(CreateProductDto dto)
         {
-            var createProduct = await _service.CreateProductAsync(dto);
-            return Ok(createProduct);
+            try
+            {
+                var createProduct = await _service.CreateProductAsync(dto);
+                return Ok(createProduct);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpGet] //Get Product
         public async Task<ActionResult> GetProduct()
@@ -30,20 +37,41 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Product
         [HttpGet("{id}")] //Get Product by Id
         public async Task<ActionResult> GetProductById(int id)
         {
-            var getProductById = await _service.GetProductByIdAsync(id);
-            return getProductById == null ? NotFound() : Ok(getProductById);
+            try
+            {
+                var getProductById = await _service.GetProductByIdAsync(id);
+                return Ok(getProductById);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
         [HttpPut("{id}")] //Update Product
         public async Task<IActionResult> PutProduct(int id, UpdateProductDto dto)
         {
-            var updateProduct = await _service.UpdateProductAsync(id, dto);
-            return updateProduct == null ? NotFound() : Ok(updateProduct);
+            try
+            {
+                var updateProduct = await _service.UpdateProductAsync(id, dto);
+                return Ok(updateProduct);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
         [HttpDelete("{id}")] //Delete Product
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            await _service.DeleteProductAsync(id);
-            return NoContent();
+            try
+            {
+                await _service.DeleteProductAsync(id);
+                return NoContent();
+            }
+            catch(KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

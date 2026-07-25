@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WMS.WarehouseTransferSystem.Api.Data;
-using WMS.WarehouseTransferSystem.Api.DTOs.Auth.Login;
 using WMS.WarehouseTransferSystem.Api.DTOs.Auth.LoginDto;
 using WMS.WarehouseTransferSystem.Api.DTOs.Auth.Token;
 using WMS.WarehouseTransferSystem.Api.Interfaces.Auth;

@@ -12,6 +12,8 @@ using WMS.WarehouseTransferSystem.Api.Services.Product;
 using WMS.WarehouseTransferSystem.Api.Services.Transfer;
 using WMS.WarehouseTransferSystem.Api.Services.Warehouse;
 using System.Text;
+using WMS.WarehouseTransferSystem.Api.Settings;
+using WMS.WarehouseTransferSystem.Api.Interfaces.Warehouse;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +21,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
-builder.Services.AddScoped<IServiecWarehouse, ServiceWarehouse>();
+builder.Services.AddScoped<IServiceWarehouse, ServiceWarehouse>();
 builder.Services.AddScoped<IServiceProduct, ServiceProduct>();
 builder.Services.AddScoped<IServiceInventory, ServiceInventory>();
 builder.Services.AddScoped<IServiceTransfer, ServiceTransfer>();
@@ -28,6 +30,12 @@ builder.Services.AddScoped<IServiceRole, ServiceRole>();
 builder.Services.AddScoped<IServiceUserRole, ServiceUserRole>();
 builder.Services.AddScoped<IServiceAuth, ServiceAuth>();
 builder.Services.AddScoped<IServiceJwt, JwtService>();
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("Jwt")
+);
+var jwtSettings = builder.Configuration
+    .GetSection("Jwt")
+    .Get<JwtSettings>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -39,13 +47,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
 
-                ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                ValidAudience = builder.Configuration["Jwt:Audience"],
+                ValidIssuer = jwtSettings!.Issuer,
+                ValidAudience = jwtSettings!.Audience,
 
                 IssuerSigningKey =
                     new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(
-                            builder.Configuration["Jwt:Key"]!
+                            jwtSettings.Key
                         )
                     )
             };

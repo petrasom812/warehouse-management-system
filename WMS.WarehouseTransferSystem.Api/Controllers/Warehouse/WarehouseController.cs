@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WMS.WarehouseTransferSystem.Api.DTOs.Warehouse;
-using WMS.WarehouseTransferSystem.Api.Interfaces;
+using WMS.WarehouseTransferSystem.Api.Interfaces.Warehouse;
 
 namespace WMS.WarehouseTransferSystem.Api.Controllers.Warehouse
 {
@@ -10,40 +10,68 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Warehouse
     [Route("api/[controller]")]
     public class WarehouseController : ControllerBase
     {
-        private readonly IServiecWarehouse _service;
-        public WarehouseController(IServiecWarehouse serviec)
+        private readonly IServiceWarehouse _serivce;
+        public WarehouseController(IServiceWarehouse service)
         {
-            _service = serviec;
+            _serivce = service;
         }
         [HttpPost] //Create Warehouse
         public async Task<ActionResult> PostWarehouse(CreateWarehouseDto dto)
         {
-            var createWarehouse = await _service.CreateWarehouseAsync(dto);
-            return Ok(createWarehouse);
+            try
+            {
+                var warehouse = await _serivce.CreateWarehouseAsync(dto);
+                return Ok(warehouse);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpGet] //Get Warehouse
         public async Task<ActionResult> GetWarehouse()
         {
-            var getWarehouse = await _service.GetWarehouseDtoAsync();
-            return Ok(getWarehouse);
+            var warehouse = await _serivce.GetWarehousesAsync();
+            return Ok(warehouse);
         }
         [HttpGet("{id}")] //Get by Id
         public async Task<ActionResult> GetWarehouseById(int id)
         {
-            var getWarehouseById = await _service.GetWarehouseByIdAsync(id);
-            return getWarehouseById == null ? NotFound() : Ok(getWarehouseById);
+            try
+            {
+                var warehouse = await _serivce.GetWarehouseByIdAsync(id);
+                return Ok(warehouse);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
         [HttpPut("{id}")] //Update Warehose
         public async Task<IActionResult> PutWarehouse(int id, UpdateWarehouseDto dto)
         {
-            var updateWarehouse = await _service.UpdateWarehouseAsync(id, dto);
-            return updateWarehouse == null ? NotFound() : Ok(updateWarehouse);
+            try
+            {
+                var warehouse = await _serivce.UpdateWarehouseAsync(id, dto);
+                return Ok(warehouse);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
         [HttpDelete("{id}")] //Delete Warehouse
         public async Task<IActionResult> DeleteWarehouse(int id)
         {
-            await _service.DeleteWarehouseAsync(id);
-            return NoContent();
+            try
+            {
+                var warehouse = await _serivce.DeleteWarehouseAsync(id);
+                return NoContent();
+            }
+            catch(KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }
