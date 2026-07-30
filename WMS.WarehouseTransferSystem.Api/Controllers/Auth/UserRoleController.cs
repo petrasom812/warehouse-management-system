@@ -16,8 +16,19 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Auth
         [HttpPost] //Create UserRole
         public async Task<ActionResult> PostUserRole(CreateUserRoleDto dto)
         {
-            var userRole = await _service.CreateUserRolelAsync(dto);
-            return Ok(userRole);
+            try
+            {
+                var userRole = await _service.CreateUserRolelAsync(dto);
+                return Ok(userRole);
+            }
+            catch (KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpGet] //Get UserRole
         public async Task<ActionResult> GetUserRole()
@@ -28,8 +39,15 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Auth
         [HttpGet("{id}")] //Get UserRole by Id
         public async Task<ActionResult> GetUserRoleById(int id)
         {
-            var userRole = await _service.GetUserRoleByIdAsync(id);
-            return userRole == null ? NotFound() : Ok(userRole);
+            try
+            {
+                var userRole = await _service.GetUserRoleByIdAsync(id);
+                return Ok(userRole);
+            }
+            catch(KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
         }
     }
 }

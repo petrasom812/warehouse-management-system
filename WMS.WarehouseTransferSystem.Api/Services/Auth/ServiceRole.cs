@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.EntityFrameworkCore;
 using WMS.WarehouseTransferSystem.Api.Data;
 using WMS.WarehouseTransferSystem.Api.DTOs.Auth.Role;
@@ -13,15 +14,12 @@ namespace WMS.WarehouseTransferSystem.Api.Services.Auth
         {
             _context = context;
         }
+        #region CRUD Operations
         //Create Role
         public async Task<GetRoleDto> CreateRoleAsync(CreateRoleDto dto)
         {
-            //Retrieve
-            var roleExists = await _context.Roles
-                .AnyAsync(r => r.RoleName == dto.RoleName);
-            //Validate
-            if (roleExists)
-                throw new ArgumentException("Role already exists.");
+            //Retrieve and validate
+            await EnsureRoleNameNotExistForCreate(dto.RoleName);
             ValidateString(dto.RoleName);
             //Mutate
             var createRole = new RoleModel
@@ -31,85 +29,104 @@ namespace WMS.WarehouseTransferSystem.Api.Services.Auth
             _context.Roles.Add(createRole);
             //persist
             await _context.SaveChangesAsync();
-
+            //return
             return MapToRoleDto(createRole);
         }
         //Get Role
         public async Task<List<GetRoleDto>> GetRoleAsync()
         {
-            //Retrieve
-            var role = await _context.Roles
+            //Projection: Retrieve and Return
+            return await _context.Roles
                 .AsNoTracking()
+                .Select(r => new GetRoleDto
+                {
+                    Id = r.Id,
+                    RoleName = r.RoleName
+                })
                 .ToListAsync();
-            //Mutate
-            return role.Select(MapToRoleDto).ToList();
         }
         //Get Roles by ID
         public async Task<GetRoleDto?> GetRoleByIdAsync(int id)
         {
-            //Retrieve
-            var role = await _context.Roles
-                .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == id);
+            //Retrieve and validate
+            var role = await EnsureRoleExists(id);
             //Mutate
-            return role == null ? null : MapToRoleDto(role);
+            return MapToRoleDto(role);
         }
-        public async Task<UpdateRoleDto?> UpdateRoleAsync(int id, UpdateRoleDto dto)
+        public async Task<GetRoleDto?> UpdateRoleAsync(int id, UpdateRoleDto dto)
         {
-            //Validate
-            await CheckDuplicateRoleAsync(dto.RoleName, id);
-            //retrieve
-            var role = await _context.Roles.FindAsync(id);
-            //validate
-            if(role == null)
-                return null;
+            //Validdate: Role name does not exist
+            await EnsureRoleNameNotExistForUpdate(id, dto.RoleName);
+            //retrieve and validate: role exists
+            var role = await EnsureRoleExists(id);
+            //Mutate
             role.RoleName = dto.RoleName;
             //persist
             await _context.SaveChangesAsync();
-            return new UpdateRoleDto
-            {
-                RoleName = role.RoleName
-            };
-
+            //return
+            return MapToRoleDto(role);
         }
         //Delete Role
         public async Task<bool> DeleteRoleAsync(int id)
         {
-            //Retrieve
-            var role = await _context.Roles.FindAsync(id);
-            //Validate
-            if(role == null)
-                return false;
+            //Retrieve and validate: Ensure role exists
+            var role = await EnsureRoleExists(id);
             //Mutate
             _context.Roles.Remove(role);
             //Persist
             await _context.SaveChangesAsync();
+            //return
             return true;
         }
-        //Validate String
+        #endregion CRUD Operations
+        #region Validation Helper
+        //Ensure sting is input correctly
         public string ValidateString(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Value cannot be null or whitespace.");
+                throw new ArgumentException("Rolename cannot be null or empty.");
             return value;
         }
+        //Ensure Rolename does not exists for Create
+        private async Task EnsureRoleNameNotExistForCreate(string roleName)
+        {
+            //retrieve
+            var role = await _context.Roles
+                .AnyAsync(r => r.RoleName == roleName);
+            //validate
+            if(role)
+                throw new ArgumentException("Role already exists.");
+        }
+        //Ensure Rolename does not exists for Update
+        private async Task EnsureRoleNameNotExistForUpdate(int id, string roleName)
+        {
+            //retrieve
+            var role = await _context.Roles
+                .AnyAsync(r => r.RoleName == roleName && r.Id != id);
+            //validate
+            if(role)
+                throw new ArgumentException("Role already exists.");
+        }
+        //Ensure Role exists (filter by Id)
+        private async Task<RoleModel> EnsureRoleExists(int id)
+        {
+            //retrieve
+            var role = await _context.Roles
+                .FirstOrDefaultAsync(r => r.Id == id);
+            //validate
+            if(role == null)
+                throw new KeyNotFoundException("Role does not exist.");
+            //return
+            return role;
+        }
+        #endregion Validation Helper
+        #region Mapper
         //Mapper
         private static GetRoleDto MapToRoleDto(RoleModel r) => new()
         {
             Id = r.Id,
             RoleName = r.RoleName
         };
-        //Check duplicate
-        private async Task CheckDuplicateRoleAsync(string roleName, int? roleId = null)
-        {
-            //Retrieve
-            var roleExists = await _context.Roles
-                .AnyAsync(r =>
-                    r.RoleName == roleName &&
-                    (!roleId.HasValue || r.Id != roleId.Value));
-            //Validate      
-            if(roleExists)
-                throw new ArgumentException("Role already exists.");
-        }
+        #endregion Mapper
     }
 }

@@ -13,13 +13,24 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Transfer
         private readonly IServiceTransfer _service;
         public TransferController(IServiceTransfer service)
         {
-            _service = service;           
+            _service = service;
         }
         [HttpPost] //Create Transfer
         public async Task<ActionResult> PostTransfer(CreateTransferDto dto)
         {
-            var createTransfer = await _service.CreateTransferAsync(dto);
-            return Ok(createTransfer);
+            try
+            {
+                var createTransfer = await _service.CreateTransferAsync(dto);
+                return Ok(createTransfer);
+            }
+            catch (ArgumentException ae)
+            {
+                return BadRequest(ae.Message);
+            }
+            catch (KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
         }
         [HttpGet] // Get Transfer
         public async Task<ActionResult> GetTransfer()
@@ -30,8 +41,15 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Transfer
         [HttpGet("{id}")] //Get Transfer by Id
         public async Task<ActionResult> GetTransferById(int id)
         {
-            var getTransferById = await _service.GetTransferByIdAsync(id);
-            return getTransferById == null ? NotFound() : Ok(getTransferById);
+            try
+            {
+                var getTransferById = await _service.GetTransferByIdAsync(id);
+                return getTransferById == null ? NotFound() : Ok(getTransferById);
+            }
+            catch(KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
         }
     }
 }

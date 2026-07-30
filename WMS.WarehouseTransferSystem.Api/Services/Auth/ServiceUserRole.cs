@@ -13,27 +13,13 @@ namespace WMS.WarehouseTransferSystem.Api.Services.Auth
         {
             _context = context;
         }
+        #region CRUD Operations
         //Create UserRole
         public async Task<GetUserRoleDto> CreateUserRolelAsync(CreateUserRoleDto dto)
         {
-            //Retrieve
-            var userExists = await _context.Users
-                .AnyAsync(u =>
-                    u.Id == dto.UserId);
-            var roleExists = await _context.Roles
-                .AnyAsync(r => 
-                    r.Id == dto.RoleId);
-            var assignmentExists = await _context.UserRoles
-                .AnyAsync(ur =>
-                    ur.UserId == dto.UserId &&
-                    ur.RoleId == dto.RoleId);
-            //Validate
-            if(!userExists)
-                throw new ArgumentException("User not exists.");
-            if(!roleExists)
-                throw new ArgumentException("Role not exists.");
-            if(assignmentExists)
-                throw new ArgumentException("User is already assigned to this role.");
+            //retrieve and validate: user and role exists
+            await EnsureUserAndRoleExistsAndActive(dto.UserId, dto.RoleId);
+            await EnsureUserRoleNotExist(dto.UserId, dto.RoleId);
             //Mutate
             var createUserRole = new UserRoleModel
             {
@@ -44,41 +30,98 @@ namespace WMS.WarehouseTransferSystem.Api.Services.Auth
             //Persist
             await _context.SaveChangesAsync();
 
-            var result = await _context.UserRoles
-                .Include(ur => ur.Role)
-                .FirstOrDefaultAsync(ur => ur.Id == createUserRole.Id);
+            var resultDetail = await RetrieveUserRoleDetail(createUserRole.Id);
 
-            return MapToUserRoleDto(createUserRole);
+            return MapToUserRoleDto(resultDetail);
         }
         //Get Role
         public async Task<List<GetUserRoleDto>> GetUserRoleAsync()
         {
-            //retrieve
-            var userRole = await _context.UserRoles
+            //Projection: return and retrieve
+            return await _context.UserRoles
                 .Include(ur => ur.Role)
+                .Include(ur => ur.User)
                 .AsNoTracking()
+                .Select(ur => new GetUserRoleDto
+                {
+                    Username = ur.User.Username,
+                    Email = ur.User.Email,
+                    RoleName = ur.Role.RoleName
+                })
                 .ToListAsync();
-            //Mutate
-            return userRole
-                .Select(MapToUserRoleDto)
-                .ToList();
         }
         public async Task<GetUserRoleDto?> GetUserRoleByIdAsync(int id)
         {
+            //retrieve and validate
+            var userRole = await EnsureUserRoleExists(id);
+            //return
+            return MapToUserRoleDto(userRole);
+        }
+        #endregion CRUD Operations
+        #region Validation Helper
+        //Ensure User and Role exists
+        private async Task EnsureUserAndRoleExistsAndActive(int userId, int roleId)
+        {
+            //retrieve
+            var user = await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new {u.IsActive})
+                .FirstOrDefaultAsync();
+            var role = await _context.Roles
+                .AnyAsync(r => r.Id == roleId);
+            //validate
+            if(user == null)
+                throw new KeyNotFoundException("User does not exist.");
+            if(!user.IsActive)
+                throw new ArgumentException("User is inactive.");
+            if(!role)
+                throw new KeyNotFoundException("Role does not exist.");
+        }
+        //Ensure User role does not exist
+        private async Task EnsureUserRoleNotExist(int userId, int roleId)
+        {
+            //retrieve
+            var userRole = await _context.UserRoles
+                .AnyAsync(ur => ur.UserId == userId &&
+                ur.RoleId == roleId);
+            //validate
+            if(userRole)
+                throw new ArgumentException("Use role already assigned.");
+        }
+        //Ensure UserRole exists
+        private async Task<UserRoleModel> EnsureUserRoleExists(int id)
+        {
             //retrieve
             var userRole = await _context.UserRoles
                 .Include(ur => ur.Role)
-                .AsNoTracking()
+                .Include(ur => ur.User)
                 .FirstOrDefaultAsync(ur => ur.Id == id);
-            //Validate & Mutate
-            return userRole == null ? null : MapToUserRoleDto(userRole);
+            //validate
+            if(userRole == null)
+                throw new KeyNotFoundException("User role does not exist.");
+            //return
+            return userRole;
         }
+        //Retrieve User Role details
+        private async Task<UserRoleModel> RetrieveUserRoleDetail(int id)
+        {
+            //retrieve
+            var userRole = await _context.UserRoles
+                .Include(ur => ur.Role)
+                .Include(ur => ur.User)
+                .FirstAsync(ur => ur.Id == id);
+            //return
+            return userRole;
+        }
+        #endregion Validation Helper
+        #region Mapper
         //Mapper
         private static GetUserRoleDto MapToUserRoleDto(UserRoleModel u) => new()
         {
-            UserId = u.UserId,
-            RoleId = u.RoleId,
-            RoleName = u.Role?.RoleName ?? ""
+            Username = u.User.Username,
+            Email = u.User.Email,
+            RoleName = u.Role.RoleName
         };
+        #endregion Mapper
     }
 }

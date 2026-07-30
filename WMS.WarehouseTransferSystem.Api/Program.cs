@@ -14,6 +14,7 @@ using WMS.WarehouseTransferSystem.Api.Services.Warehouse;
 using System.Text;
 using WMS.WarehouseTransferSystem.Api.Settings;
 using WMS.WarehouseTransferSystem.Api.Interfaces.Warehouse;
+using WMS.WarehouseTransferSystem.Api.Interfaces.Inventory;
 
 var builder = WebApplication.CreateBuilder(args);
 

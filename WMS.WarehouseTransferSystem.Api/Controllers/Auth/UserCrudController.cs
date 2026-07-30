@@ -16,8 +16,19 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Auth
         [HttpPost] //Create User
         public async Task<ActionResult> PostUser(CreateUserDto dto)
         {
-            var user = await _service.CreateUserAsync(dto);
-            return Ok(user);
+            try
+            {
+                var user = await _service.CreateUserAsync(dto);
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpGet] //Get Users
         public async Task<ActionResult> GetUser()
@@ -29,19 +40,33 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Auth
         public async Task<ActionResult> GetUserById(int id)
         {
             var user = await _service.GetUserByIdAsync(id);
-            return user == null ? NotFound() : Ok(user);
+            return Ok(user);
         }
         [HttpPut("{id}")] // update user
         public async Task<IActionResult> PutUser(int id, UpdateUserDto dto)
         {
-            var user = await _service.UpdateUserAsync(id, dto);
-            return user == null ? NotFound() : Ok(user);
+            try
+            {
+                var user = await _service.UpdateUserAsync(id, dto);
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
         }
         [HttpDelete("{id}")] //Hard delete user
         public async Task<IActionResult> DeleteUser(int id)
         {
-            await _service.DeleteUserAsync(id);
-            return NoContent();
+            try
+            {
+                await _service.DeleteUserAsync(id);
+                return NoContent();
+            }
+            catch(KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
         }
     }
 }
