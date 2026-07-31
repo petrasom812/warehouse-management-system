@@ -23,5 +23,47 @@ namespace WMS.WarehouseTransferSystem.Api.Data
         public DbSet<UserModel> Users {get; set;}
         public DbSet<RoleModel> Roles {get; set;}
         public DbSet<UserRoleModel> UserRoles {get; set;}
+
+        //relationship
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            //Inventory -> Warehouse
+            modelBuilder.Entity<InventoryModel>()
+            .HasOne(i => i.Warehouse)
+            .WithMany(w => w.Inventories)
+            .HasForeignKey(i => i.WarehouseId);
+
+            //Inventory -> Product
+            modelBuilder.Entity<InventoryModel>()
+            .HasOne(i => i.Product)
+            .WithMany(p => p.Inventories)
+            .HasForeignKey(i => i.ProductId);
+
+            //Transfer -> Source Warehouse
+            modelBuilder.Entity<TransferModel>()
+            .HasOne(t => t.SourceWarehouse)
+            .WithMany(w => w.SourceTransfers)
+            .HasForeignKey(t => t.SourceWarehouseId);
+
+            //Transfer -> Destination Warhouse
+            modelBuilder.Entity<TransferModel>()
+            .HasOne(t => t.DestinationWarehouse)
+            .WithMany(w => w.DestinationTransfers)
+            .HasForeignKey(t => t.DestinationWarehouseId);
+
+            //TransferItem -> Transfer
+            modelBuilder.Entity<TransferItemModel>()
+            .HasOne(ti => ti.Transfer)
+            .WithMany(t => t.TransferItems)
+            .HasForeignKey(ti => ti.TransferId);
+
+            //TransferItem -> Product
+            modelBuilder.Entity<TransferItemModel>()
+            .HasOne(ti => ti.Product)
+            .WithMany(p => p.TransferItems)
+            .HasForeignKey(ti => ti.ProductId);
+        }
     }
 }

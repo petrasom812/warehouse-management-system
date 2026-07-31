@@ -11,7 +11,7 @@ namespace WMS.WarehouseTransferSystem.Api.Interfaces.Auth
         Task<GetRoleDto> CreateRoleAsync(CreateRoleDto dto);
         Task<List<GetRoleDto>> GetRoleAsync();
         Task<GetRoleDto?> GetRoleByIdAsync(int id);
-        Task<UpdateRoleDto?> UpdateRoleAsync(int id, UpdateRoleDto dto);
+        Task<GetRoleDto?> UpdateRoleAsync(int id, UpdateRoleDto dto);
         Task<bool> DeleteRoleAsync(int id);
     }
 }

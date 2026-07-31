@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.ObjectPool;
 using WMS.WarehouseTransferSystem.Api.DTOs.Auth;
 using WMS.WarehouseTransferSystem.Api.Interfaces.Auth;
 
@@ -20,20 +17,41 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Auth
         [HttpDelete("{id}")] //Deactivate user
         public async Task<IActionResult?> SoftDeleteUser(int id)
         {
-            await _service.DeactivateUserAsync(id);
-            return NoContent();
+            try
+            {
+                await _service.DeactivateUserAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
         }
         [HttpPatch("{id}")] //Reactivate user
         public async Task<IActionResult> ReactivateUser(int id)
         {
-            var user = await _service.ReactivateUserAsync(id);
-            return !user ? NotFound() : Ok(user);
+            try
+            {
+                var user = await _service.ReactivateUserAsync(id);
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
         }
         [HttpPut("{userId}")]
         public async Task<IActionResult> PutPassword(int userId, ChangePasswordDto dto)
         {
-            var user = await _service.ChangePasswordAsync(userId, dto);
-            return user == null ? NotFound() : Ok(user);
+            try
+            {
+                var user = await _service.ChangePasswordAsync(userId, dto);
+                return Ok(user);
+            }
+            catch(KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
         }
-    }   
+    }
 }

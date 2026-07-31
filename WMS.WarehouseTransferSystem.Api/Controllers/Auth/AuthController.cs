@@ -14,11 +14,19 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers
         {
             _service = service;
         }
+        [AllowAnonymous]
         [HttpPost]//Login
         public async Task<ActionResult> PostLogIn(LoginDto dto)
         {
             var token = await _service.LoginAsync(dto);
             return Ok(token);
         }
+        [Authorize]
+        [HttpGet("adminuser")]
+        public IActionResult Admin()
+        {
+            return Ok("Adminuser");
+        }
+
     }
 }

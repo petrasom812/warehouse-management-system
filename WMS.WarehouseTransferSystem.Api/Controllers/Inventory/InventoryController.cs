@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WMS.WarehouseTransferSystem.Api.DTOs.Inventory;
-using WMS.WarehouseTransferSystem.Api.Interfaces;
+using WMS.WarehouseTransferSystem.Api.Interfaces.Inventory;
 
 namespace WMS.WarehouseTransferSystem.Api.Controllers.Inventory
 {
@@ -10,7 +10,7 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Inventory
     [Route("api/[controller]")]
     public class InventoryController : ControllerBase
     {
-        private readonly IServiceInventory _service;
+        private readonly  IServiceInventory _service;
         public InventoryController(IServiceInventory service)
         {
             _service = service;
@@ -19,8 +19,19 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Inventory
         [HttpPost]
         public async Task<ActionResult> PostInventory(CreateInventoryDto dto)
         {
-            var createInventory = await _service.CreateInventoryAsync(dto);
-            return Ok(createInventory);
+            try
+            {
+                var createInventory = await _service.CreateInventoryAsync(dto);
+                return Ok(createInventory);
+            }
+            catch(KeyNotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpGet] //Get Inventory
         public async Task<ActionResult> GetInventory()
@@ -31,20 +42,41 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Inventory
         [HttpGet("{id}")] //Get Inventory by Id
         public async Task<ActionResult> GetInventoryById(int id)
         {
-            var getInventoryById = await _service.GetProductByIdAsync(id);
-            return getInventoryById == null ? NotFound() : Ok(getInventoryById);
+            try
+            {
+                var getInventoryById = await _service.GetInventoryByIdAsync(id);
+                return Ok(getInventoryById);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
         [HttpPut("{id}")] //Update Inventory
         public async Task<IActionResult> PutInventory(int id, UpdateInventoryDto dto)
         {
-            var updateInventory = await _service.UpdateInventoryAsync(id, dto);
-            return updateInventory == null ? NotFound() : Ok(updateInventory);
+            try
+            {
+                var updateInventory = await _service.UpdateInventoryAsync(id, dto);
+                return Ok(updateInventory);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
         [HttpDelete("{id}")] //delete inventory
         public async Task<IActionResult> DeleteInventory(int id)
         {
-            await _service.DeleteInventoryAsync(id);
-            return NoContent();
+            try
+            {
+                await _service.DeleteInventoryAsync(id);
+                return NoContent();
+            }
+            catch(KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

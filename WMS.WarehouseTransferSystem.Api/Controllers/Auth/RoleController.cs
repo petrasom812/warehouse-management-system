@@ -17,8 +17,19 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Auth
         [HttpPost]//Create Role
         public async Task<ActionResult> PostRole(CreateRoleDto dto)
         {
-            var role = await _service.CreateRoleAsync(dto);
-            return Ok(role);
+            try
+            {
+                var role = await _service.CreateRoleAsync(dto);
+                return Ok(role);
+            }
+            catch (KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpGet]//Get role
         public async Task<ActionResult> GetRole()
@@ -29,20 +40,45 @@ namespace WMS.WarehouseTransferSystem.Api.Controllers.Auth
         [HttpGet("{id}")]//Get Role by Id
         public async Task<ActionResult> GetRoleById(int id)
         {
-            var role = await _service.GetRoleByIdAsync(id);
-            return role == null ? NotFound() : Ok(role);
+            try
+            {
+                var role = await _service.GetRoleByIdAsync(id);
+                return Ok(role);
+            }
+            catch (KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
         }
         [HttpPut("{id}")] //update role
         public async Task<IActionResult> PutRole(int id, UpdateRoleDto dto)
         {
-            var role = await _service.UpdateRoleAsync(id, dto);
-            return role == null ? NotFound() : Ok(role);
+            try
+            {
+                var role = await _service.UpdateRoleAsync(id, dto);
+                return Ok(role);
+            }
+            catch (KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpDelete("{id}")] // delete role
         public async Task<IActionResult> DeleteRole(int id)
         {
-            await _service.DeleteRoleAsync(id);
-            return NoContent();
+            try
+            {
+                await _service.DeleteRoleAsync(id);
+                return NoContent();
+            }
+            catch(KeyNotFoundException ke)
+            {
+                return NotFound(ke.Message);
+            }
         }
     }
 }

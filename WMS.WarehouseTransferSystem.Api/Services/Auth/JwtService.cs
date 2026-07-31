@@ -7,6 +7,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using WMS.WarehouseTransferSystem.Api.Interfaces.Auth;
+using WMS.WarehouseTransferSystem.Api.Settings;
+using Microsoft.Extensions.Options;
 
 
 namespace WMS.WarehouseTransferSystem.Api.Services.Auth
@@ -14,13 +16,13 @@ namespace WMS.WarehouseTransferSystem.Api.Services.Auth
     public class JwtService : IServiceJwt
     {
         private readonly AppDbContext _context;
-        private readonly IConfiguration _configuration;
+        private readonly JwtSettings _jwtSetting;
         public JwtService(
             AppDbContext context,
-            IConfiguration configuration)
+            IOptions<JwtSettings> options)
         {
             _context = context;
-            _configuration =configuration;
+            _jwtSetting = options.Value;
         }
         public async Task<TokenResponseDto> JwtTokenAsync(UserModel user)
         {
@@ -47,11 +49,11 @@ namespace WMS.WarehouseTransferSystem.Api.Services.Auth
             };
             claims.AddRange(claimRole);
             //expiration
-            var expiration = DateTime.UtcNow.AddHours(8);
+            var expiration = DateTime.UtcNow.AddMinutes(_jwtSetting.ExpiryMinute);
             //Key
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(
-                    _configuration["Jwt:Key"]!
+                    _jwtSetting.Key!
                 )
             );
             //Credential
@@ -61,8 +63,8 @@ namespace WMS.WarehouseTransferSystem.Api.Services.Auth
             );
             //Create Token
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: _jwtSetting.Issuer,
+                audience: _jwtSetting.Audience,
                 claims: claims,
                 expires: expiration,
                 signingCredentials: credentials

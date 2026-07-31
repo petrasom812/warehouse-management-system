@@ -7,9 +7,9 @@ namespace WMS.WarehouseTransferSystem.Api.Models.Inventory
     {
         public int Id { get; set; }
         public int WarehouseId { get; set; }
-        public WarehouseModel? Warehouse {get; set;}
+        public WarehouseModel Warehouse {get; set;} = null!;
         public int ProductId { get; set; }
-        public ProductModel? Product {get; set;}
+        public ProductModel Product {get; set;} = null!;
         public int Quantity { get; set; }
     }
 }

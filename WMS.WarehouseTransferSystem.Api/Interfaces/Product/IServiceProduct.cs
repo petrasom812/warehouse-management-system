@@ -7,7 +7,7 @@ namespace WMS.WarehouseTransferSystem.Api.Interfaces.Product
         Task<GetProductDto> CreateProductAsync(CreateProductDto dto);
         Task<List<GetProductDto>> GetProductAsync();
         Task<GetProductDto?> GetProductByIdAsync(int id);
-        Task<UpdateProductDto?> UpdateProductAsync(int id, UpdateProductDto dto);
+        Task<GetProductDto?> UpdateProductAsync(int id, UpdateProductDto dto);
         Task<bool> DeleteProductAsync(int id);
     }
 }
